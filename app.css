@@ -1,0 +1,54 @@
+body {
+	font-family: arial;
+	background: #0e172b;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+}
+
+#appContainer {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+h1 {
+	color: white;
+}
+
+#gameBoard {
+	width: 306px;
+	height: 306px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+.field {
+	width: 100px;
+	height: 100px;
+	border: 1px solid black;
+	font-size: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: #e2e8f1;
+	transition: 250ms ease-in-out;
+}
+
+.field:hover {
+	cursor: pointer;
+	background: #cad5e2;
+	transition: 250ms ease-in-out;
+}
+
+#statusMessage {
+	color: #f1f5f9;
+	font-weight: 600;
+	margin-top: 20px;
+	font-size: 0.9rem;
+}
