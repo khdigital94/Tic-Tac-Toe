@@ -51,6 +51,8 @@ h1 {
 	font-weight: 600;
 	margin-top: 20px;
 	font-size: 0.9rem;
+	max-width: 300px;
+	text-align: center;
 }
 
 #resetBtn {
