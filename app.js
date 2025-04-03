@@ -19,7 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
 					cellElement.dataset.row = rowIndex;
 					cellElement.dataset.col = colIndex;
 
-					cellElement.addEventListener("click", () => playRound(rowIndex, colIndex));
+					if (!isGameOver) {
+						cellElement.addEventListener("click", () => playRound(rowIndex, colIndex));	
+					}
 					cellElement.textContent = board[rowIndex][colIndex];
 
 					appContainer.appendChild(cellElement);
@@ -67,6 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	const player1 = createPlayer("Kevin", "x");
 	const player2 = createPlayer("Markus", "o");
 	let activePlayer = player1;
+	let isGameOver = false;
 
 	function checkWinner(board) {
 		const combinations = [
@@ -87,8 +90,10 @@ document.addEventListener("DOMContentLoaded", () => {
 			if (flatBoard[a] && flatBoard[a] === flatBoard[b] && flatBoard[b] === flatBoard[c]) {
 				gameBoard.updateMessage(`${activePlayer.name} hat diese Runde gewonnen!`);
 				activePlayer.increaseScore();
+				isGameOver = true;
 				refreshPlayerScores();
 				setTimeout(() => {
+					isGameOver = false;
 					gameBoard.clear();
 					gameBoard.updateMessage("");
 				}, 1000);
@@ -97,8 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 
 		if (flatBoard.every((cell) => cell)) {
+			isGameOver = true;
 			gameBoard.updateMessage("Unentschieden!");
 			setTimeout(() => {
+				isGameOver = false;
 				gameBoard.clear();
 				gameBoard.updateMessage("");
 			}, 1000);
@@ -118,7 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
 		checkWinner(board);
 
 		activePlayer = activePlayer === player1 ? player2 : player1;
-		gameBoard.updateMessage(`${activePlayer.name} ist am Zug!`);
+		
+		!isGameOver ? gameBoard.updateMessage(`${activePlayer.name} ist am Zug!`) : null;
 		gameBoard.render();
 	}
 
