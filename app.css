@@ -18,6 +18,24 @@ h1 {
 	color: white;
 }
 
+.playerScores {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	column-gap: 10px;
+	color: white;
+	margin-bottom: 20px;
+}
+
+.playerScores span {
+	padding: 6px 10px;
+	background: #062f4a;
+	border: 1px solid #23445c;
+	border-radius: 5px;
+	display: flex;
+	column-gap: 5px;
+}
+
 #gameBoard {
 	width: 306px;
 	height: 306px;
