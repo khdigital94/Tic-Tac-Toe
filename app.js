@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
+	const resetButton = document.querySelector("#resetBtn");
+
 	const gameBoard = (function () {
 		let board = [
 			["", "", ""],
@@ -38,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const updateMessage = (message) => {
 			const messageContainer = document.querySelector("#statusMessage");
-			messageContainer.textContent = message;
+			messageContainer.textContent = message || `Wähle ein Feld aus, um den ersten Zug zu machen. ${player1.name} beginnt!`;
 		};
 
 		return { render, clear, getBoard, updateMessage };
@@ -49,12 +51,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const increaseScore = () => score++;
 		const getScore = () => score;
+		const resetScore = () => {
+			score = 0;
+		};
 
 		return {
 			name,
 			symbol,
 			increaseScore,
 			getScore,
+			resetScore,
 		};
 	}
 
@@ -80,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			const [a, b, c] = comb;
 			if (flatBoard[a] && flatBoard[a] === flatBoard[b] && flatBoard[b] === flatBoard[c]) {
 				gameBoard.updateMessage(`${activePlayer.name} hat diese Runde gewonnen!`);
-				activePlayer.increaseScore;
+				activePlayer.increaseScore();
 				setTimeout(() => {
 					gameBoard.clear();
 					gameBoard.updateMessage("");
@@ -115,6 +121,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		gameBoard.render();
 	}
 
+	resetButton.addEventListener("click", () => {
+		gameBoard.clear();
+		player1.resetScore();
+		player2.resetScore();
+		gameBoard.updateMessage();
+	});
+
 	gameBoard.render();
-	gameBoard.updateMessage(`${player1.name} ist am Zug!`);
+	gameBoard.updateMessage();
 });
