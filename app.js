@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-	const resetButton = document.querySelector("#resetBtn");
 
 	const gameBoard = (function () {
 		let board = [
@@ -19,8 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 					cellElement.dataset.row = rowIndex;
 					cellElement.dataset.col = colIndex;
 
-					if (!isGameOver) {
-						cellElement.addEventListener("click", () => playRound(rowIndex, colIndex));	
+					if (!gameController.getIsGameOver()) {
+						cellElement.addEventListener("click", () => gameController.playRound(rowIndex, colIndex));	
 					}
 					cellElement.textContent = board[rowIndex][colIndex];
 
@@ -40,15 +39,110 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		const getBoard = () => board;
 
+		
+
+		return { render, clear, getBoard };
+	})();
+
+	const gameController = (function () {
+		let isGameOver = false;
+		const resetButton = document.querySelector("#resetBtn");
+		const player1ScoreElement = document.querySelector("#player1Score");
+		const player2ScoreElement = document.querySelector("#player2Score");
+
+		const playRound = (row, col) => {
+			const board = gameBoard.getBoard();
+	
+			if (board[row][col] !== "") {
+				gameController.updateMessage("Dieses Feld ist bereits belegt!");
+				return;
+			}
+	
+			board[row][col] = activePlayer.symbol;
+	
+			checkWinner(board);
+	
+			activePlayer = activePlayer === player1 ? player2 : player1;
+
+			(!getIsGameOver()) ? gameController.updateMessage(`${activePlayer.name} ist am Zug!`) : null;
+			gameBoard.render();
+		}
+
+		const checkWinner = (board) => {
+			const combinations = [
+				[0, 1, 2],
+				[3, 4, 5],
+				[6, 7, 8],
+				[0, 3, 6],
+				[1, 4, 7],
+				[2, 5, 8],
+				[0, 4, 8],
+				[2, 4, 6],
+			];
+	
+			const flatBoard = board.flat();
+	
+			for (let comb of combinations) {
+				const [a, b, c] = comb;
+				if (flatBoard[a] && flatBoard[a] === flatBoard[b] && flatBoard[b] === flatBoard[c]) {
+					gameController.updateMessage(`${activePlayer.name} hat diese Runde gewonnen!`);
+					activePlayer.increaseScore();
+					setIsGameOver(true);
+					gameController.refreshPlayerScores();
+					setTimeout(() => {
+						setIsGameOver(false)
+						gameBoard.clear();
+						gameController.updateMessage("");
+					}, 1000);
+					return;
+				}
+			}
+	
+			if (flatBoard.every((cell) => cell)) {
+				setIsGameOver(true)
+				gameController.updateMessage("Unentschieden!");
+				setTimeout(() => {
+					setIsGameOver(false);
+					gameBoard.clear();
+					gameController.updateMessage("");
+				}, 1000);
+			}
+		}
+
+		const refreshPlayerScores = () => {
+			player1ScoreElement.textContent = `${player1.name}: ${player1.getScore()}`;
+			player2ScoreElement.textContent = `${player2.name}: ${player2.getScore()}`;
+		};
+
 		const updateMessage = (message) => {
 			const messageContainer = document.querySelector("#statusMessage");
 			messageContainer.textContent = message || `Wähle ein Feld aus, um den ersten Zug zu machen. ${player1.name} beginnt!`;
 		};
 
-		return { render, clear, getBoard, updateMessage };
+		const getIsGameOver = () => isGameOver;
+		const setIsGameOver = (value) => isGameOver = value;
+
+		const resetGame = () => {
+			gameBoard.clear();
+			updateMessage();
+			player1.resetScore();
+			player2.resetScore();
+			refreshPlayerScores();
+		}
+
+		return {
+			isGameOver,
+			resetButton,
+			playRound,
+			resetGame,
+			refreshPlayerScores,
+			updateMessage,
+			getIsGameOver,
+			setIsGameOver
+		}
 	})();
 
-	function createPlayer(name, symbol) {
+	const createPlayer = (name, symbol) => {
 		let score = 0;
 
 		const increaseScore = () => score++;
@@ -69,84 +163,12 @@ document.addEventListener("DOMContentLoaded", () => {
 	const player1 = createPlayer("Kevin", "x");
 	const player2 = createPlayer("Markus", "o");
 	let activePlayer = player1;
-	let isGameOver = false;
 
-	function checkWinner(board) {
-		const combinations = [
-			[0, 1, 2],
-			[3, 4, 5],
-			[6, 7, 8],
-			[0, 3, 6],
-			[1, 4, 7],
-			[2, 5, 8],
-			[0, 4, 8],
-			[2, 4, 6],
-		];
-
-		const flatBoard = board.flat();
-
-		for (let comb of combinations) {
-			const [a, b, c] = comb;
-			if (flatBoard[a] && flatBoard[a] === flatBoard[b] && flatBoard[b] === flatBoard[c]) {
-				gameBoard.updateMessage(`${activePlayer.name} hat diese Runde gewonnen!`);
-				activePlayer.increaseScore();
-				isGameOver = true;
-				refreshPlayerScores();
-				setTimeout(() => {
-					isGameOver = false;
-					gameBoard.clear();
-					gameBoard.updateMessage("");
-				}, 1000);
-				return;
-			}
-		}
-
-		if (flatBoard.every((cell) => cell)) {
-			isGameOver = true;
-			gameBoard.updateMessage("Unentschieden!");
-			setTimeout(() => {
-				isGameOver = false;
-				gameBoard.clear();
-				gameBoard.updateMessage("");
-			}, 1000);
-		}
-	}
-
-	function playRound(row, col) {
-		const board = gameBoard.getBoard();
-
-		if (board[row][col] !== "") {
-			gameBoard.updateMessage("Dieses Feld ist bereits belegt!");
-			return;
-		}
-
-		board[row][col] = activePlayer.symbol;
-
-		checkWinner(board);
-
-		activePlayer = activePlayer === player1 ? player2 : player1;
-		
-		!isGameOver ? gameBoard.updateMessage(`${activePlayer.name} ist am Zug!`) : null;
-		gameBoard.render();
-	}
-
-	const refreshPlayerScores = () => {
-		const player1ScoreElement = document.querySelector("#player1Score");
-		const player2ScoreElement = document.querySelector("#player2Score");
-
-		player1ScoreElement.textContent = `${player1.name}: ${player1.getScore()}`;
-		player2ScoreElement.textContent = `${player2.name}: ${player2.getScore()}`;
-	};
-
-	resetButton.addEventListener("click", () => {
-		gameBoard.clear();
-		gameBoard.updateMessage();
-		player1.resetScore();
-		player2.resetScore();
-		refreshPlayerScores();
+	gameController.resetButton.addEventListener("click", () => {
+		gameController.resetGame();
 	});
 
 	gameBoard.render();
-	gameBoard.updateMessage();
-	refreshPlayerScores();
+	gameController.updateMessage();
+	gameController.refreshPlayerScores();
 });
