@@ -52,3 +52,22 @@ h1 {
 	margin-top: 20px;
 	font-size: 0.9rem;
 }
+
+#resetBtn {
+	padding: 10px 25px;
+	margin-top: 20px;
+	background: #0084d1;
+	color: white;
+	border: 1px solid #038bcf;
+	border-radius: 5px;
+	transition: 250ms ease-in-out;
+	font-size: 1.1rem;
+	font-weight: 600;
+}
+
+#resetBtn:hover {
+	cursor: pointer;
+	background: #00d3f2;
+	border-color: #00d8f4;
+	transition: 250ms ease-in-out;
+}
