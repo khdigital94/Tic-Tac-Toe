@@ -87,6 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			if (flatBoard[a] && flatBoard[a] === flatBoard[b] && flatBoard[b] === flatBoard[c]) {
 				gameBoard.updateMessage(`${activePlayer.name} hat diese Runde gewonnen!`);
 				activePlayer.increaseScore();
+				refreshPlayerScores();
 				setTimeout(() => {
 					gameBoard.clear();
 					gameBoard.updateMessage("");
@@ -121,13 +122,23 @@ document.addEventListener("DOMContentLoaded", () => {
 		gameBoard.render();
 	}
 
+	const refreshPlayerScores = () => {
+		const player1ScoreElement = document.querySelector("#player1Score");
+		const player2ScoreElement = document.querySelector("#player2Score");
+
+		player1ScoreElement.textContent = `${player1.name}: ${player1.getScore()}`;
+		player2ScoreElement.textContent = `${player2.name}: ${player2.getScore()}`;
+	};
+
 	resetButton.addEventListener("click", () => {
 		gameBoard.clear();
+		gameBoard.updateMessage();
 		player1.resetScore();
 		player2.resetScore();
-		gameBoard.updateMessage();
+		refreshPlayerScores();
 	});
 
 	gameBoard.render();
 	gameBoard.updateMessage();
+	refreshPlayerScores();
 });
